@@ -186,14 +186,11 @@ enum MarkdownContentLocale {
             return "zh-Hans"
         }
 
-        let script = ns.scriptCode.isEmpty
-            ? scriptImplied(byRegion: ns.countryCode)
-            : ns.scriptCode
+        let script = ns.scriptCode ?? scriptImplied(byRegion: ns.countryCode)
         guard script == "Hant" else {
             return "zh-Hans"
         }
-        let region = ns.countryCode
-        guard !region.isEmpty, region != "TW" else {
+        guard let region = ns.countryCode, region != "TW" else {
             return "zh-Hant"
         }
         return "zh-Hant-\(region)"
@@ -201,10 +198,10 @@ enum MarkdownContentLocale {
 
     /// `zh_CN` carries no script code and iOS 15 has no `maximalIdentifier`
     /// to expand it with; the region implies the script.
-    private static func scriptImplied(byRegion region: String) -> String? {
+    private static func scriptImplied(byRegion region: String?) -> String? {
         switch region {
-        case "TW", "HK", "MO": return "Hant"
-        case "CN", "SG", "MY": return "Hans"
+        case "TW"?, "HK"?, "MO"?: return "Hant"
+        case "CN"?, "SG"?, "MY"?: return "Hans"
         default: return nil
         }
     }
