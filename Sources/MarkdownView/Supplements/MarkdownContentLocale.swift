@@ -146,7 +146,7 @@ enum MarkdownContentLocale {
         if let cached = cjkLanguageByLocale[key] {
             return cached
         }
-        let language = normalizedLanguage(locale.language)
+        let language = normalizedLanguage(locale)
         cjkLanguageByLocale[key] = language
         return language
     }
@@ -171,27 +171,39 @@ enum MarkdownContentLocale {
     ///
     /// Any language that is not Chinese, Japanese or Korean falls back to
     /// Simplified Chinese, as it always has.
-    static func normalizedLanguage(_ language: Locale.Language) -> String {
-        switch language.languageCode {
-        case .japanese?:
+    static func normalizedLanguage(_ locale: Locale) -> String {
+        // Locale.Language arrived in iOS 16; NSLocale exposes the same
+        // language / script / region components on every OS this runs on.
+        let ns = NSLocale(localeIdentifier: locale.identifier)
+        switch ns.languageCode {
+        case "ja"?:
             return "ja"
-        case .korean?:
+        case "ko"?:
             return "ko"
-        case .chinese?:
+        case "zh"?:
             break
         default:
             return "zh-Hans"
         }
 
-        let script = language.script
-            ?? Locale.Language(identifier: language.maximalIdentifier).script
-        guard script == .hanTraditional else {
+        let script = ns.scriptCode ?? scriptImplied(byRegion: ns.countryCode)
+        guard script == "Hant" else {
             return "zh-Hans"
         }
-        guard let region = language.region, region != .taiwan else {
+        guard let region = ns.countryCode, region != "TW" else {
             return "zh-Hant"
         }
-        return "zh-Hant-\(region.identifier)"
+        return "zh-Hant-\(region)"
+    }
+
+    /// `zh_CN` carries no script code and iOS 15 has no `maximalIdentifier`
+    /// to expand it with; the region implies the script.
+    private static func scriptImplied(byRegion region: String?) -> String? {
+        switch region {
+        case "TW"?, "HK"?, "MO"?: return "Hant"
+        case "CN"?, "SG"?, "MY"?: return "Hans"
+        default: return nil
+        }
     }
 
     private static func characterRanges(in string: String) -> [NSRange] {

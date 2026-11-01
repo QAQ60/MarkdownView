@@ -23,6 +23,7 @@ import SwiftUI
             updateMarkdownTextView(uiView, coordinator: context.coordinator)
         }
 
+        @available(iOS 16.0, macOS 13.0, tvOS 16.0, *)
         func sizeThatFits(
             _ proposal: ProposedViewSize,
             uiView: MarkdownTextView,
@@ -52,6 +53,7 @@ import SwiftUI
             updateMarkdownTextView(nsView, coordinator: context.coordinator)
         }
 
+        @available(iOS 16.0, macOS 13.0, tvOS 16.0, *)
         func sizeThatFits(
             _ proposal: ProposedViewSize,
             nsView: MarkdownTextView,

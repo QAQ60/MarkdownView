@@ -80,6 +80,7 @@ final class MarkdownViewCoordinator {
         pendingIsStreaming = nil
     }
 
+    @available(iOS 16.0, macOS 13.0, tvOS 16.0, *)
     func sizeThatFits(_ proposal: ProposedViewSize, for view: MarkdownTextView) -> CGSize? {
         // A zero-width proposal asks for the minimum width. Text can wrap to
         // any width, so answer with zero — reporting the current layout width
